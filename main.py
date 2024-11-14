@@ -85,7 +85,7 @@ if __name__ == '__main__':
         'Betas' : [0.9, 0.999],
         'Gamma' : 0.1,
         'Milestone' : [60000, 86666],
-        'Weight_Decay' : 0.1,
+        'Weight_Decay' : 0.1
     }
 
     main(CFG)
