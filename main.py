@@ -29,7 +29,7 @@ def main(CFG):
     print(CFG)
     set_seed(CFG)
     
-    model = sam_model_registry['vit_b'](checkpoint='./checkpoint/sam_vit_b_01ec64.pth')
+    model = sam_model_registry[CFG['Model_Size']](checkpoint=CFG['Checkpoint'])
 
     data = pd.read_csv(CFG['Meta_Path'])
     train_data, tmp_data = train_test_split(data, test_size=0.2, random_state=CFG['Random_Seed'])
@@ -41,6 +41,7 @@ def main(CFG):
     valid_dataloader = DataLoader(valid_dataset, batch_size=CFG['Batch_Size'], shuffle=False, num_workers=CFG['Num_Workers'])
     test_dataloader = DataLoader(test_dataset, batch_size=CFG['Batch_Size'], shuffle=False, num_workers=CFG['Num_Workers'])
 
+    CFG['Role'] = 'Train'
     optimizer = optim.AdamW(model.mask_decoder.parameters(),
                            lr = CFG['Learning_Rate'], 
                            betas = CFG['Betas'], 
@@ -67,20 +68,25 @@ def main(CFG):
 if __name__ == '__main__':
 
     CFG = {
+        'Model_Name' : 'sam',
+        'Model_Size' : 'vit_b',
+        'Checkpoint' : './checkpoint/sam_vit_b_01ec64.pth',
+
         'Device' : torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
         'Today_Date' : datetime.date.today(),
         'Current_Time' : datetime.datetime.now().strftime('%H%M'),
-        'Meta_Path' : '',
-        'Image_Dir' : '',
-        'Mask_Dir' : '',
 
-        'Epochs' : 50,
+        'Meta_Path' : '../skinex_burn/data/segmentation/test/meta.csv',
+        'Image_Dir' : '../skinex_burn/data/segmentation/test/image',
+        'Mask_Dir' : '../skinex_burn/data/segmentation/test/mask',
+
         'Random_Seed' : 42,
-        'Resize' : 256,
+        'Epochs' : 50,
         'Batch_Size' : 32,
+        'Learning_Rate': 1e-5,
         'Num_Workers' : 8,
 
-        'Learning_Rate': 1e-5,
+        'Resize' : 256,
         'Betas' : [0.9, 0.999],
         'Gamma' : 0.1,
         'Milestone' : [60000, 86666],
